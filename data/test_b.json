@@ -1,0 +1,23 @@
+{
+  "question": "The service is failing after a deployment. What should the on-call engineer do first?",
+  "documents": [
+    {
+      "document_id": "GUIDE-12",
+      "type": "troubleshooting",
+      "service": "service-a",
+      "date": "2024-02-01",
+      "version": "v1",
+      "title": "Service restart procedure",
+      "content": "Restart Service A when latency remains high."
+    },
+    {
+      "document_id": "GUIDE-41",
+      "type": "troubleshooting",
+      "service": "service-a",
+      "date": "2026-08-10",
+      "version": "v3",
+      "title": "Service A incident procedure",
+      "content": "Do not restart Service A during dependency failures. Check dependency health first."
+    }
+  ]
+}

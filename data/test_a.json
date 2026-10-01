@@ -1,0 +1,32 @@
+{
+  "question": "Why did the Order API become slow on September 16? Check whether the deployment was related and whether we have seen this before.",
+  "documents": [
+    {
+      "document_id": "INC-1042",
+      "type": "incident_report",
+      "service": "orders-api",
+      "date": "2026-09-16",
+      "version": "v2.8.1",
+      "title": "Order API latency spike",
+      "content": "P95 latency increased significantly. The incident began shortly after the latest deployment."
+    },
+    {
+      "document_id": "DEP-882",
+      "type": "deployment_note",
+      "service": "orders-api",
+      "date": "2026-09-15",
+      "version": "v2.8.1",
+      "title": "Orders deployment",
+      "content": "Version v2.8.1 was deployed to production at 18:10 UTC."
+    },
+    {
+      "document_id": "PM-211",
+      "type": "postmortem",
+      "service": "orders-api",
+      "date": "2026-05-03",
+      "version": "v2.6.0",
+      "title": "Previous latency incident",
+      "content": "A previous latency incident was caused by database connection saturation during a schema migration."
+    }
+  ]
+}

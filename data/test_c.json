@@ -1,0 +1,23 @@
+{
+  "question": "Did this exact failure happen before?",
+  "documents": [
+    {
+      "document_id": "INC-300",
+      "type": "incident_report",
+      "service": "catalog-api",
+      "date": "2026-07-11",
+      "version": "v5",
+      "title": "Catalog latency",
+      "content": "Latency increased due to database saturation."
+    },
+    {
+      "document_id": "INC-301",
+      "type": "incident_report",
+      "service": "orders-api",
+      "date": "2026-07-12",
+      "version": "v4",
+      "title": "Order errors",
+      "content": "Requests failed because of an expired certificate."
+    }
+  ]
+}

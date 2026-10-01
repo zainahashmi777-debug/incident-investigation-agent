@@ -1,0 +1,95 @@
+{
+  "question": "The Payments API checkout flow started failing right after this morning's deployment. Was the deployment related, does this match anything in our incident history, and what should on-call do first \u2014 restart the service or not?",
+  "documents": [
+    {
+      "document_id": "INC-2050",
+      "type": "incident_report",
+      "service": "payments-api",
+      "date": "2026-09-17",
+      "version": "v4.2.0",
+      "title": "Payments API checkout failures spike",
+      "content": "Checkout requests began timing out and returning errors shortly after the latest deployment. Latency also increased across checkout endpoints."
+    },
+    {
+      "document_id": "DEP-950",
+      "type": "deployment_note",
+      "service": "payments-api",
+      "date": "2026-09-17",
+      "version": "v4.2.0",
+      "title": "Payments deployment - new rate limiter",
+      "content": "Version v4.2.0 was deployed to production at 09:40 UTC, introducing a new rate limiter in front of the checkout endpoint."
+    },
+    {
+      "document_id": "ARCH-77",
+      "type": "architecture_doc",
+      "service": "payments-api",
+      "date": "2026-06-01",
+      "version": "v4",
+      "title": "Payments API architecture and dependencies",
+      "content": "The payments-api service depends on fraud-check-service for fraud scoring and ledger-service for settlement during checkout. Dependency topology is documented here for on-call reference."
+    },
+    {
+      "document_id": "GUIDE-88",
+      "type": "troubleshooting",
+      "service": "payments-api",
+      "date": "2025-01-10",
+      "version": "v3",
+      "title": "Payments service restart procedure",
+      "content": "Restart the payments service when checkout latency remains high for more than five minutes."
+    },
+    {
+      "document_id": "GUIDE-95",
+      "type": "troubleshooting",
+      "service": "payments-api",
+      "date": "2026-08-10",
+      "version": "v4",
+      "title": "Payments incident procedure",
+      "content": "Do not restart the service during a rate limiter rollout; check dependency health first and scale down inbound traffic instead."
+    },
+    {
+      "document_id": "CC-310",
+      "type": "customer_complaint",
+      "service": "payments-api",
+      "date": "2026-09-17",
+      "version": null,
+      "title": "Customers unable to complete checkout",
+      "content": "Multiple customers reported checkout errors and timeouts starting this morning, right around the usual deployment window."
+    },
+    {
+      "document_id": "PM-180",
+      "type": "postmortem",
+      "service": "payments-api",
+      "date": "2025-11-02",
+      "version": "v3.5.0",
+      "title": "Previous checkout outage postmortem",
+      "content": "A previous checkout outage was caused by the fraud-check service timing out under peak load, resulting in checkout errors for users."
+    },
+    {
+      "document_id": "INC-1900",
+      "type": "incident_report",
+      "service": "fraud-check-service",
+      "date": "2025-11-01",
+      "version": "v2.1",
+      "title": "Fraud check service latency outage",
+      "content": "The fraud-check-service experienced elevated latency, causing downstream timeouts for services that call it during checkout."
+    },
+    {
+      "document_id": "DEP-700",
+      "type": "deployment_note",
+      "service": "orders-api",
+      "date": "2026-06-01",
+      "version": "v2.5.0",
+      "title": "Orders API hotfix deployment",
+      "content": "A hotfix for retry logic was deployed to the orders-api service, unrelated to the payments checkout flow."
+    },
+    {
+      "document_id": "CC-050",
+      "type": "customer_complaint",
+      "service": "catalog-api",
+      "date": "2026-04-10",
+      "version": null,
+      "title": "Slow catalog search results",
+      "content": "Customers complained about slow search results on the catalog browsing page, unrelated to checkout or payments."
+    }
+  ]
+}

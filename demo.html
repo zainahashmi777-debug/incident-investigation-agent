@@ -1,0 +1,714 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Investigation Nobody Could Answer — Agent Demo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #12161B;
+    --bg-panel: #181D23;
+    --bg-card: #1F262D;
+    --ink: #E9E4D8;
+    --ink-dim: #9BA3AA;
+    --line: #323B44;
+    --pin: #E1A33D;
+    --thread: #C0524A;
+    --ok: #6FA98C;
+    --warn: #D9895A;
+    --serif: 'Source Serif 4', Georgia, 'Times New Roman', serif;
+    --sans: 'IBM Plex Sans', -apple-system, Segoe UI, sans-serif;
+    --mono: 'IBM Plex Mono', ui-monospace, Menlo, Consolas, monospace;
+    color-scheme: dark;
+  }
+  :root:not([data-theme="light"]) { /* dark is default look for this case-board concept */ }
+  :root[data-theme="light"] {
+    --bg: #EDE7DA;
+    --bg-panel: #F5F1E7;
+    --bg-card: #FFFDF7;
+    --ink: #21201B;
+    --ink-dim: #6B655A;
+    --line: #D8D0BE;
+    --pin: #B5791E;
+    --thread: #A5423B;
+    --ok: #3E7A5C;
+    --warn: #B15E2C;
+  }
+  @media (prefers-color-scheme: light) {
+    :root:not([data-theme="dark"]) {
+      --bg: #EDE7DA;
+      --bg-panel: #F5F1E7;
+      --bg-card: #FFFDF7;
+      --ink: #21201B;
+      --ink-dim: #6B655A;
+      --line: #D8D0BE;
+      --pin: #B5791E;
+      --thread: #A5423B;
+      --ok: #3E7A5C;
+      --warn: #B15E2C;
+    }
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--sans);
+    min-height: 100vh;
+    background-image:
+      radial-gradient(circle at 1px 1px, rgba(255,255,255,0.035) 1px, transparent 0);
+    background-size: 26px 26px;
+  }
+  :root[data-theme="light"] body, @media (prefers-color-scheme: light) { }
+
+  header {
+    padding: 2.6rem 2rem 1.4rem;
+    max-width: 1180px;
+    margin: 0 auto;
+    border-bottom: 1px solid var(--line);
+  }
+  .kicker {
+    font-family: var(--mono);
+    font-size: 0.78rem;
+    letter-spacing: 0.02em;
+    color: var(--pin);
+    margin: 0 0 0.6rem;
+  }
+  h1 {
+    font-family: var(--serif);
+    font-weight: 600;
+    font-size: clamp(1.7rem, 3.4vw, 2.5rem);
+    margin: 0 0 0.5rem;
+    max-width: 22ch;
+    line-height: 1.15;
+  }
+  header p.sub {
+    color: var(--ink-dim);
+    max-width: 62ch;
+    line-height: 1.55;
+    font-size: 0.98rem;
+    margin: 0;
+  }
+
+  main {
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 2rem;
+    display: grid;
+    grid-template-columns: 300px 1fr;
+    gap: 2rem;
+  }
+  @media (max-width: 860px) {
+    main { grid-template-columns: 1fr; }
+  }
+
+  .panel {
+    background: var(--bg-panel);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 1.3rem;
+  }
+  .panel h2 {
+    font-family: var(--serif);
+    font-size: 1.05rem;
+    margin: 0 0 1rem;
+    font-weight: 600;
+  }
+  .case-list { display: flex; flex-direction: column; gap: 0.5rem; margin-bottom: 1.4rem; }
+  .case-btn {
+    text-align: left;
+    background: var(--bg-card);
+    border: 1px solid var(--line);
+    color: var(--ink);
+    padding: 0.7rem 0.85rem;
+    border-radius: 5px;
+    cursor: pointer;
+    font-family: var(--sans);
+    font-size: 0.88rem;
+    line-height: 1.4;
+    transition: border-color 0.15s ease;
+  }
+  .case-btn:hover { border-color: var(--pin); }
+  .case-btn.active { border-color: var(--pin); box-shadow: 0 0 0 1px var(--pin) inset; }
+  .case-btn .tag {
+    display: block;
+    font-family: var(--mono);
+    font-size: 0.68rem;
+    color: var(--pin);
+    margin-bottom: 0.25rem;
+    letter-spacing: 0.03em;
+  }
+
+  label { display: block; font-size: 0.8rem; color: var(--ink-dim); margin: 1rem 0 0.35rem; }
+  textarea, input[type=text] {
+    width: 100%;
+    background: var(--bg-card);
+    border: 1px solid var(--line);
+    color: var(--ink);
+    border-radius: 5px;
+    padding: 0.6rem 0.7rem;
+    font-family: var(--mono);
+    font-size: 0.8rem;
+    resize: vertical;
+  }
+  textarea { min-height: 130px; }
+  button.run {
+    margin-top: 1rem;
+    width: 100%;
+    background: var(--pin);
+    color: #1B1204;
+    border: none;
+    border-radius: 5px;
+    padding: 0.75rem 1rem;
+    font-family: var(--sans);
+    font-weight: 600;
+    font-size: 0.92rem;
+    cursor: pointer;
+  }
+  button.run:hover { filter: brightness(1.06); }
+  .err { color: var(--warn); font-size: 0.8rem; margin-top: 0.6rem; display: none; }
+
+  /* ---- case file output ---- */
+  .verdict {
+    background: var(--bg-card);
+    border: 1px solid var(--line);
+    border-left: 4px solid var(--pin);
+    border-radius: 4px;
+    padding: 1.3rem 1.4rem;
+    margin-bottom: 1.6rem;
+  }
+  .verdict.insufficient { border-left-color: var(--warn); }
+  .verdict.contradiction { border-left-color: var(--thread); }
+  .verdict .q {
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    color: var(--ink-dim);
+    margin-bottom: 0.7rem;
+  }
+  .verdict .a {
+    font-family: var(--serif);
+    font-size: 1.14rem;
+    line-height: 1.55;
+  }
+  .status-tag {
+    display: inline-block;
+    font-family: var(--mono);
+    font-size: 0.68rem;
+    letter-spacing: 0.03em;
+    padding: 0.2rem 0.5rem;
+    border-radius: 3px;
+    margin-bottom: 0.7rem;
+    border: 1px solid var(--line);
+  }
+  .status-tag.ok { color: var(--ok); border-color: var(--ok); }
+  .status-tag.warn { color: var(--warn); border-color: var(--warn); }
+  .status-tag.thread { color: var(--thread); border-color: var(--thread); }
+
+  section.block { margin-bottom: 1.8rem; }
+  section.block h3 {
+    font-family: var(--serif);
+    font-size: 1rem;
+    font-weight: 600;
+    margin: 0 0 0.8rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  section.block h3::before {
+    content: "";
+    width: 6px; height: 6px;
+    background: var(--pin);
+    border-radius: 50%;
+    display: inline-block;
+  }
+
+  .evidence-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 0.85rem; }
+  .card {
+    position: relative;
+    background: var(--bg-card);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    padding: 0.9rem 0.95rem 0.95rem;
+  }
+  .card::before {
+    content: "";
+    position: absolute;
+    top: -5px; left: 16px;
+    width: 10px; height: 10px;
+    background: var(--pin);
+    border-radius: 50%;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.4);
+  }
+  .card .doc-id { font-family: var(--mono); font-size: 0.85rem; color: var(--pin); margin-bottom: 0.3rem; }
+  .card .meta { font-family: var(--mono); font-size: 0.68rem; color: var(--ink-dim); margin-bottom: 0.55rem; }
+  .card .reason { font-size: 0.82rem; line-height: 1.45; color: var(--ink); }
+  .card .score {
+    position: absolute; top: 0.7rem; right: 0.8rem;
+    font-family: var(--mono); font-size: 0.68rem; color: var(--ink-dim);
+  }
+
+  .contradiction-row {
+    display: flex; align-items: stretch; gap: 0.8rem; flex-wrap: wrap;
+    background: var(--bg-card); border: 1px solid var(--thread);
+    border-radius: 5px; padding: 0.9rem;
+    position: relative;
+  }
+  .contradiction-row .side { flex: 1; min-width: 200px; }
+  .contradiction-row .vs {
+    align-self: center; font-family: var(--serif); color: var(--thread);
+    font-weight: 700; font-size: 1rem;
+  }
+  .contradiction-row .doc-id { font-family: var(--mono); color: var(--thread); font-size: 0.85rem; }
+  .contradiction-row .content { font-size: 0.82rem; margin-top: 0.3rem; }
+  .contradiction-resolution {
+    margin-top: 0.7rem; font-size: 0.8rem; color: var(--ink-dim);
+    border-top: 1px dashed var(--line); padding-top: 0.6rem; width: 100%;
+  }
+
+  .trail { border-left: 2px solid var(--line); padding-left: 1rem; display: flex; flex-direction: column; gap: 0.9rem; }
+  .trail .step { font-size: 0.82rem; line-height: 1.5; position: relative; }
+  .trail .step::before {
+    content: "";
+    position: absolute; left: -1.31rem; top: 0.3rem;
+    width: 8px; height: 8px; border-radius: 50%;
+    background: var(--pin); border: 2px solid var(--bg-panel);
+  }
+  .trail .step b { color: var(--pin); font-family: var(--mono); font-size: 0.72rem; }
+
+  footer {
+    max-width: 1180px; margin: 0 auto; padding: 1.5rem 2rem 3rem;
+    color: var(--ink-dim); font-size: 0.78rem; border-top: 1px solid var(--line); margin-top: 1rem;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <p class="kicker">CASE FILE // INCIDENT INVESTIGATION AGENT</p>
+  <h1>The Investigation Nobody Could Answer</h1>
+  <p class="sub">Ask an operational question, and the agent searches incident reports, deployment
+  notes, postmortems, and troubleshooting guides — following leads across documents, weighing
+  dates and versions, and catching guidance that contradicts itself — before it will commit to
+  an answer.</p>
+</header>
+
+<main>
+  <div class="panel">
+    <h2>Select a case</h2>
+    <div class="case-list" id="caseList"></div>
+
+    <h2 style="margin-top:0.4rem;">Or bring your own</h2>
+    <label for="qInput">Investigation question</label>
+    <input type="text" id="qInput" placeholder="e.g. Why did the Order API slow down?">
+    <label for="docInput">documents.json</label>
+    <textarea id="docInput" placeholder='[{"document_id": "...", "type": "...", ...}]'></textarea>
+    <div class="err" id="errBox"></div>
+    <button class="run" id="runBtn">Investigate</button>
+  </div>
+
+  <div id="output"></div>
+</main>
+
+<footer>
+  Client-side reimplementation of the Python reference agent — hybrid lexical + metadata
+  retrieval, multi-hop expansion, and negation-aware contradiction detection, all running
+  locally with no external calls.
+</footer>
+
+<script>
+/* ---------------------------------------------------------------------
+   Sample cases (mirrors data/test_a.json, test_b.json, test_c.json)
+--------------------------------------------------------------------- */
+const CASES = {
+  a: {
+    label: "Test A", tag: "DEPLOYMENT-RELATED",
+    question: "Why did the Order API become slow on September 16? Check whether the deployment was related and whether we have seen this before.",
+    documents: [
+      { document_id: "INC-1042", type: "incident_report", service: "orders-api", date: "2026-09-16", version: "v2.8.1", title: "Order API latency spike", content: "P95 latency increased significantly. The incident began shortly after the latest deployment." },
+      { document_id: "DEP-882", type: "deployment_note", service: "orders-api", date: "2026-09-15", version: "v2.8.1", title: "Orders deployment", content: "Version v2.8.1 was deployed to production at 18:10 UTC." },
+      { document_id: "PM-211", type: "postmortem", service: "orders-api", date: "2026-05-03", version: "v2.6.0", title: "Previous latency incident", content: "A previous latency incident was caused by database connection saturation during a schema migration." }
+    ]
+  },
+  b: {
+    label: "Test B", tag: "CONTRADICTORY GUIDANCE",
+    question: "The service is failing after a deployment. What should the on-call engineer do first?",
+    documents: [
+      { document_id: "GUIDE-12", type: "troubleshooting", service: "service-a", date: "2024-02-01", version: "v1", title: "Service restart procedure", content: "Restart Service A when latency remains high." },
+      { document_id: "GUIDE-41", type: "troubleshooting", service: "service-a", date: "2026-08-10", version: "v3", title: "Service A incident procedure", content: "Do not restart Service A during dependency failures. Check dependency health first." }
+    ]
+  },
+  c: {
+    label: "Test C", tag: "INSUFFICIENT EVIDENCE",
+    question: "Did this exact failure happen before?",
+    documents: [
+      { document_id: "INC-300", type: "incident_report", service: "catalog-api", date: "2026-07-11", version: "v5", title: "Catalog latency", content: "Latency increased due to database saturation." },
+      { document_id: "INC-301", type: "incident_report", service: "orders-api", date: "2026-07-12", version: "v4", title: "Order errors", content: "Requests failed because of an expired certificate." }
+    ]
+  },
+  d: {
+    label: "Test D", tag: "10-DOCUMENT CORPUS",
+    question: "The Payments API checkout flow started failing right after this morning's deployment. Was the deployment related, does this match anything in our incident history, and what should on-call do first \u2014 restart the service or not?",
+    documents: [
+      { document_id: "INC-2050", type: "incident_report", service: "payments-api", date: "2026-09-17", version: "v4.2.0", title: "Payments API checkout failures spike", content: "Checkout requests began timing out and returning errors shortly after the latest deployment. Latency also increased across checkout endpoints." },
+      { document_id: "DEP-950", type: "deployment_note", service: "payments-api", date: "2026-09-17", version: "v4.2.0", title: "Payments deployment - new rate limiter", content: "Version v4.2.0 was deployed to production at 09:40 UTC, introducing a new rate limiter in front of the checkout endpoint." },
+      { document_id: "ARCH-77", type: "architecture_doc", service: "payments-api", date: "2026-06-01", version: "v4", title: "Payments API architecture and dependencies", content: "The payments-api service depends on fraud-check-service for fraud scoring and ledger-service for settlement during checkout. Dependency topology is documented here for on-call reference." },
+      { document_id: "GUIDE-88", type: "troubleshooting", service: "payments-api", date: "2025-01-10", version: "v3", title: "Payments service restart procedure", content: "Restart the payments service when checkout latency remains high for more than five minutes." },
+      { document_id: "GUIDE-95", type: "troubleshooting", service: "payments-api", date: "2026-08-10", version: "v4", title: "Payments incident procedure", content: "Do not restart the service during a rate limiter rollout; check dependency health first and scale down inbound traffic instead." },
+      { document_id: "CC-310", type: "customer_complaint", service: "payments-api", date: "2026-09-17", version: null, title: "Customers unable to complete checkout", content: "Multiple customers reported checkout errors and timeouts starting this morning, right around the usual deployment window." },
+      { document_id: "PM-180", type: "postmortem", service: "payments-api", date: "2025-11-02", version: "v3.5.0", title: "Previous checkout outage postmortem", content: "A previous checkout outage was caused by the fraud-check service timing out under peak load, resulting in checkout errors for users." },
+      { document_id: "INC-1900", type: "incident_report", service: "fraud-check-service", date: "2025-11-01", version: "v2.1", title: "Fraud check service latency outage", content: "The fraud-check-service experienced elevated latency, causing downstream timeouts for services that call it during checkout." },
+      { document_id: "DEP-700", type: "deployment_note", service: "orders-api", date: "2026-06-01", version: "v2.5.0", title: "Orders API hotfix deployment", content: "A hotfix for retry logic was deployed to the orders-api service, unrelated to the payments checkout flow." },
+      { document_id: "CC-050", type: "customer_complaint", service: "catalog-api", date: "2026-04-10", version: null, title: "Slow catalog search results", content: "Customers complained about slow search results on the catalog browsing page, unrelated to checkout or payments." }
+    ]
+  }
+};
+
+/* ---------------------------------------------------------------------
+   Core agent logic (mirrors agent.py)
+--------------------------------------------------------------------- */
+const STOPWORDS = new Set(["the","a","an","is","was","were","are","be","been","to","of","and","or","in","on","for","we","us","our","this","that","it","did","do","does","has","have","had","what","why","how","when","should","check","whether","first","i","you","your","if","with","before","not","any","so"]);
+
+function tokenize(text) {
+  if (!text) return new Set();
+  const words = (text.toLowerCase().match(/[a-z0-9]+/g)) || [];
+  return new Set(words.filter(w => !STOPWORDS.has(w) && w.length > 1));
+}
+function setIntersect(a, b) { return new Set([...a].filter(x => b.has(x))); }
+function setUnion(a, b) { return new Set([...a, ...b]); }
+
+function normalizeService(text) {
+  let t = text.toLowerCase().trim().replace(/_/g, "-").replace(/\s+/g, "-").replace(/-+/g, "-");
+  if (t === "order-api") t = "orders-api";
+  return t;
+}
+
+const TYPE_TRIGGERS = {
+  incident_report: new Set(["incident","happened","before","history","spike","outage"]),
+  deployment_note: new Set(["deploy","deployment","deployed","release","rollout"]),
+  postmortem: new Set(["postmortem","before","previous","root","cause","history"]),
+  troubleshooting: new Set(["restart","procedure","oncall","on-call","do","should","first","guide"]),
+  customer_complaint: new Set(["customer","complaint","users","reported"]),
+  architecture_doc: new Set(["architecture","design","topology","dependency","dependencies"]),
+};
+const NEGATION_RE = /\b(do not|don't|never|avoid|should not|stop)\b/i;
+
+function boostedTypes(queryTokens) {
+  const boosted = new Set();
+  for (const [type, triggers] of Object.entries(TYPE_TRIGGERS)) {
+    if (setIntersect(queryTokens, triggers).size > 0) boosted.add(type);
+  }
+  return boosted;
+}
+
+function docTextBlob(doc) {
+  return [doc.title, doc.content, doc.type, doc.service].filter(Boolean).join(" ");
+}
+
+function scoreDocument(doc, queryTokens, boostedTypesSet, serviceHint, versionHint, relaxVersion) {
+  const docTokens = tokenize(docTextBlob(doc));
+  const titleTokens = tokenize(doc.title);
+  const overlap = setIntersect(queryTokens, docTokens);
+  const titleOverlap = setIntersect(queryTokens, titleTokens);
+
+  let lexical = docTokens.size ? overlap.size / Math.max(setUnion(queryTokens, docTokens).size, 1) : 0;
+  lexical += 0.15 * titleOverlap.size;
+
+  let score = lexical;
+  const reasons = [];
+  if (overlap.size) reasons.push("keyword overlap: " + [...overlap].sort().join(", "));
+
+  if (boostedTypesSet.has(doc.type)) { score += 0.6; reasons.push(`document type '${doc.type}' matches question intent`); }
+  if (serviceHint && doc.service && normalizeService(doc.service) === serviceHint) { score += 0.9; reasons.push(`same service (${doc.service})`); }
+  if (versionHint && doc.version && doc.version.toLowerCase() === versionHint && !relaxVersion) { score += 0.4; reasons.push(`matches version ${doc.version}`); }
+
+  return { score, reason: reasons.length ? reasons.join("; ") : "weak topical match" };
+}
+
+function extractEntities(text, documents) {
+  const services = new Set(), versions = new Set();
+  const lower = text.toLowerCase();
+  for (const doc of documents) {
+    if (doc.service) {
+      const spaced = doc.service.replace(/-/g, " ");
+      if (lower.includes(spaced) || lower.includes(doc.service.toLowerCase())) services.add(normalizeService(doc.service));
+    }
+  }
+  for (const m of text.matchAll(/\b([A-Za-z]+)\s+API\b/gi)) services.add(normalizeService(m[1] + "-api"));
+  for (const m of text.matchAll(/\bv\d+(?:\.\d+){0,2}\b/gi)) versions.add(m[0].toLowerCase());
+  return { services, versions };
+}
+
+function search(documents, queryText, { serviceHint = null, versionHint = null, typeFilter = null, relaxVersion = false, topK = 10 } = {}) {
+  const queryTokens = tokenize(queryText);
+  let boosted = boostedTypes(queryTokens);
+  if (typeFilter) boosted = setUnion(boosted, typeFilter);
+
+  const scored = [];
+  for (const doc of documents) {
+    const { score, reason } = scoreDocument(doc, queryTokens, boosted, serviceHint, versionHint, relaxVersion);
+    if (score > 0) scored.push({ doc, score: Math.round(score * 1000) / 1000, reason });
+  }
+  scored.sort((a, b) => b.score - a.score);
+  return scored.slice(0, topK);
+}
+
+function detectContradictions(evidence) {
+  const contradictions = [];
+  const guidanceDocs = evidence
+    .map(e => e.doc)
+    .filter(d => d.type === "troubleshooting" || /restart/i.test(d.content));
+
+  for (let i = 0; i < guidanceDocs.length; i++) {
+    for (let j = i + 1; j < guidanceDocs.length; j++) {
+      const a = guidanceDocs[i], b = guidanceDocs[j];
+      if (a.service && b.service && normalizeService(a.service) !== normalizeService(b.service)) continue;
+      const aTopic = setIntersect(tokenize(a.content), new Set(["restart", "service"]));
+      const bTopic = setIntersect(tokenize(b.content), new Set(["restart", "service"]));
+      if (!(aTopic.size && bTopic.size)) continue;
+
+      const aNeg = NEGATION_RE.test(a.content), bNeg = NEGATION_RE.test(b.content);
+      if (aNeg !== bNeg) {
+        const aDate = new Date(a.date), bDate = new Date(b.date);
+        let resolution;
+        let newer, older;
+        if (!isNaN(aDate) && !isNaN(bDate)) {
+          [newer, older] = aDate > bDate ? [a, b] : [b, a];
+          resolution = `'${newer.document_id}' (${newer.date}, ${newer.version}) is more recent than '${older.document_id}' (${older.date}, ${older.version}) and should be treated as the current guidance.`;
+        } else {
+          resolution = "Unable to determine recency; flag for human review.";
+        }
+        contradictions.push({
+          docA: a, docB: b, newer, older,
+          explanation: "Directly conflicting operational guidance on the same action (restart) for the same service.",
+          resolution
+        });
+      }
+    }
+  }
+  return contradictions;
+}
+
+function synthesize(question, evidence, contradictions, wantsHistory) {
+  const FLOOR = 0.35;
+  const strong = evidence.filter(e => e.score >= FLOOR);
+
+  if (contradictions.length) {
+    const c = contradictions[0];
+    return {
+      status: "contradiction",
+      answer: `Found conflicting guidance for this situation. ${c.explanation} ${c.resolution} Follow '${c.newer.document_id}' as the current procedure, and flag the older document for deprecation.`,
+      evidence
+    };
+  }
+
+  if (!strong.length) {
+    let answer = "There is not enough evidence in the available documents to give a confident, evidence-backed answer to this question. ";
+    if (evidence.length) {
+      const weakIds = evidence.slice(0, 3).map(e => e.doc.document_id).join(", ");
+      answer += `The closest matches (${weakIds}) reference different services and/or different root causes than what the question describes, so they cannot be treated as the same incident recurring. Recommend broadening the search window or providing more specific symptoms (service name, error signature, or timeframe).`;
+    } else {
+      answer += "No documents in the corpus matched this question at all.";
+    }
+    return { status: "insufficient", answer, evidence };
+  }
+
+  const incidents = strong.filter(e => e.doc.type === "incident_report").map(e => e.doc);
+  const deployments = strong.filter(e => e.doc.type === "deployment_note").map(e => e.doc);
+  const postmortems = strong.filter(e => e.doc.type === "postmortem").map(e => e.doc);
+  const parts = [];
+
+  if (incidents.length && deployments.length) {
+    const inc = incidents[0], dep = deployments[0];
+    const incDate = new Date(inc.date), depDate = new Date(dep.date);
+    if (!isNaN(incDate) && !isNaN(depDate) && depDate <= incDate) {
+      parts.push(`The incident described in ${inc.document_id} (${inc.date}) began after deployment ${dep.document_id} shipped ${dep.version} on ${dep.date}, so the deployment is the most likely trigger.`);
+    } else {
+      parts.push(`${inc.document_id} and ${dep.document_id} both concern ${inc.service || dep.service}, but the timing does not clearly establish that the deployment caused the incident.`);
+    }
+  } else if (incidents.length) {
+    parts.push(`${incidents[0].document_id} documents the incident directly, but no matching deployment note was found to confirm a deployment trigger.`);
+  }
+
+  if (wantsHistory) {
+    if (postmortems.length) {
+      const pm = postmortems[0];
+      let sameRootCause = false;
+      if (incidents.length) {
+        const incTokens = tokenize(incidents[0].content), pmTokens = tokenize(pm.content);
+        sameRootCause = setIntersect(incTokens, pmTokens).size >= 2;
+      }
+      if (sameRootCause) {
+        parts.push(`A similar symptom occurred before: ${pm.document_id} (${pm.date}, ${pm.version}) describes a related latency issue, though the root cause recorded there (${pm.content.trim().replace(/\.$/, "")}) differs from the current incident's likely trigger, so treat this as similar-but-not-identical rather than a repeat of the same root cause.`);
+      } else {
+        parts.push(`${pm.document_id} (${pm.date}) shows a prior incident on the same service, but with a different recorded cause, so it should not be treated as the same failure recurring.`);
+      }
+    } else {
+      parts.push("No prior incident or postmortem for this service/symptom was found in the corpus, so this does not appear to be a repeat of a known issue based on available evidence.");
+    }
+  }
+
+  if (!parts.length) parts.push("The retrieved documents are topically related but do not, on their own, fully answer the question with high confidence.");
+  return { status: "ok", answer: parts.join(" "), evidence };
+}
+
+function investigate(documents, question) {
+  const hopsLog = [];
+  const entities = extractEntities(question, documents);
+  const serviceHint = entities.services.size ? [...entities.services][0] : null;
+  const versionHint = entities.versions.size ? [...entities.versions][0] : null;
+
+  const hop1 = search(documents, question, { serviceHint, versionHint });
+  hopsLog.push(`Hop 1 — direct search for question (service_hint=${serviceHint}, version_hint=${versionHint}): found ${hop1.length} candidate(s) → ${hop1.map(e => e.doc.document_id).join(", ") || "none"}`);
+
+  const qTokens = tokenize(question);
+  const wantsHistory = setIntersect(qTokens, new Set(["before", "history", "previous", "ever", "again"])).size > 0;
+
+  let hop2;
+  if (wantsHistory) {
+    hop2 = search(documents, [...qTokens].join(" ") + " previous incident postmortem history", {
+      serviceHint, versionHint: null, typeFilter: new Set(["postmortem", "incident_report"]), relaxVersion: true
+    });
+    hopsLog.push(`Hop 2 — historical search (version constraint relaxed, service_hint=${serviceHint}) to look for prior occurrences: found ${hop2.length} → ${hop2.map(e => e.doc.document_id).join(", ") || "none"}`);
+  } else {
+    hop2 = search(documents, [...qTokens].join(" "), {
+      serviceHint, versionHint, typeFilter: new Set(["deployment_note", "troubleshooting", "architecture_doc"])
+    });
+    hopsLog.push(`Hop 2 — supporting-context search (deployment/architecture/guides): found ${hop2.length} → ${hop2.map(e => e.doc.document_id).join(", ") || "none"}`);
+  }
+
+  const merged = new Map();
+  for (const e of [...hop1, ...hop2]) {
+    const key = e.doc.document_id;
+    if (!merged.has(key) || e.score > merged.get(key).score) merged.set(key, e);
+  }
+  const evidence = [...merged.values()].sort((a, b) => b.score - a.score);
+  const contradictions = detectContradictions(evidence);
+  const result = synthesize(question, evidence, contradictions, wantsHistory);
+
+  return { question, ...result, contradictions, hops: hopsLog };
+}
+
+/* ---------------------------------------------------------------------
+   UI wiring
+--------------------------------------------------------------------- */
+const caseListEl = document.getElementById("caseList");
+const qInput = document.getElementById("qInput");
+const docInput = document.getElementById("docInput");
+const outputEl = document.getElementById("output");
+const errBox = document.getElementById("errBox");
+let activeCase = "a";
+
+function renderCaseList() {
+  caseListEl.innerHTML = "";
+  Object.entries(CASES).forEach(([key, c]) => {
+    const btn = document.createElement("button");
+    btn.className = "case-btn" + (key === activeCase ? " active" : "");
+    btn.innerHTML = `<span class="tag">${c.tag}</span>${c.question}`;
+    btn.onclick = () => { activeCase = key; loadCase(key); };
+    caseListEl.appendChild(btn);
+  });
+}
+
+function loadCase(key) {
+  activeCase = key;
+  const c = CASES[key];
+  qInput.value = c.question;
+  docInput.value = JSON.stringify(c.documents, null, 2);
+  renderCaseList();
+  run();
+}
+
+function escapeHtml(s) {
+  return String(s).replace(/[&<>"']/g, m => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[m]));
+}
+
+function render(result) {
+  const statusClass = result.status === "insufficient" ? "insufficient" : (result.status === "contradiction" ? "contradiction" : "");
+  const tagClass = result.status === "insufficient" ? "warn" : (result.status === "contradiction" ? "thread" : "ok");
+  const tagLabel = result.status === "insufficient" ? "INSUFFICIENT EVIDENCE" : (result.status === "contradiction" ? "CONTRADICTION FOUND" : "EVIDENCE-BACKED ANSWER");
+
+  let html = `
+    <div class="verdict ${statusClass}">
+      <span class="status-tag ${tagClass}">${tagLabel}</span>
+      <div class="q">Q: ${escapeHtml(result.question)}</div>
+      <div class="a">${escapeHtml(result.answer)}</div>
+    </div>`;
+
+  if (result.contradictions.length) {
+    html += `<section class="block"><h3>Contradictions detected</h3>`;
+    for (const c of result.contradictions) {
+      html += `
+        <div class="contradiction-row">
+          <div class="side">
+            <div class="doc-id">${escapeHtml(c.docA.document_id)} <span style="color:var(--ink-dim); font-weight:400;">(${c.docA.date}, ${c.docA.version})</span></div>
+            <div class="content">${escapeHtml(c.docA.content)}</div>
+          </div>
+          <div class="vs">⇄</div>
+          <div class="side">
+            <div class="doc-id">${escapeHtml(c.docB.document_id)} <span style="color:var(--ink-dim); font-weight:400;">(${c.docB.date}, ${c.docB.version})</span></div>
+            <div class="content">${escapeHtml(c.docB.content)}</div>
+          </div>
+          <div class="contradiction-resolution">${escapeHtml(c.resolution)}</div>
+        </div>`;
+    }
+    html += `</section>`;
+  }
+
+  html += `<section class="block"><h3>Evidence used</h3>`;
+  if (!result.evidence.length) {
+    html += `<p style="color:var(--ink-dim); font-size:0.85rem;">No documents met the relevance threshold.</p>`;
+  } else {
+    html += `<div class="evidence-grid">`;
+    for (const e of result.evidence) {
+      html += `
+        <div class="card">
+          <span class="score">score ${e.score}</span>
+          <div class="doc-id">${escapeHtml(e.doc.document_id)}</div>
+          <div class="meta">type=${escapeHtml(e.doc.type)} ${e.doc.service ? "· service=" + escapeHtml(e.doc.service) : ""} · date=${escapeHtml(e.doc.date)} ${e.doc.version ? "· version=" + escapeHtml(e.doc.version) : ""}</div>
+          <div class="reason">${escapeHtml(e.reason)}</div>
+        </div>`;
+    }
+    html += `</div>`;
+  }
+  html += `</section>`;
+
+  html += `<section class="block"><h3>Investigation trail</h3><div class="trail">`;
+  result.hops.forEach((h, i) => {
+    html += `<div class="step"><b>STEP ${i + 1}</b><br>${escapeHtml(h)}</div>`;
+  });
+  html += `</div></section>`;
+
+  outputEl.innerHTML = html;
+}
+
+function run() {
+  errBox.style.display = "none";
+  let documents;
+  try {
+    documents = JSON.parse(docInput.value);
+    if (!Array.isArray(documents)) throw new Error("documents.json must be a JSON array");
+  } catch (err) {
+    errBox.textContent = "Could not parse documents.json: " + err.message;
+    errBox.style.display = "block";
+    return;
+  }
+  const question = qInput.value.trim();
+  if (!question) {
+    errBox.textContent = "Enter an investigation question.";
+    errBox.style.display = "block";
+    return;
+  }
+  const result = investigate(documents, question);
+  render(result);
+}
+
+document.getElementById("runBtn").addEventListener("click", run);
+renderCaseList();
+loadCase("a");
+</script>
+</body>
+</html>
