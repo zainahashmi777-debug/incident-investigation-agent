@@ -31,16 +31,14 @@ embedding model; after that, the model can be reused from the local cache.
 
 ```mermaid
 flowchart TD
-    Q[Natural-language question] --> E[Entity extraction<br/>service / version / date]
-    E --> H1[Hop 1: direct search<br/>question text + entity hints]
-    H1 --> D{Question implies<br/>"has this happened before"?}
-    D -- yes --> H2a[Hop 2: historical search<br/>relax version constraint,<br/>boost postmortem/incident_report]
-    D -- no --> H2b[Hop 2: supporting-context search<br/>boost deployment_note/troubleshooting/architecture_doc]
-    H2a --> M[Merge + de-dupe<br/>keep best score per doc]
-    H2b --> M
-    M --> C[Contradiction detection<br/>negation-aware directive comparison]
-    C --> S[Answer synthesis<br/>evidence floor + recency/version resolution]
-    S --> R[Evidence-backed answer<br/>+ document IDs<br/>+ insufficient-evidence flag]
+    Q[Natural-language question] --> E[Entity extraction]
+    E --> H1[Hop 1: direct search]
+    H1 --> D{Historical event?}
+    D -- Yes --> H2a[Hop 2: historical search]
+    D -- No --> H2b[Hop 2: supporting context search]
+    H2a --> R[Rank and combine evidence]
+    H2b --> R
+    R --> A[Generate investigation answer]
 ```
 
 ## How each core requirement is met
